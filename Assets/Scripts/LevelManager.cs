@@ -16,11 +16,16 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private int levelNumber; //-1 for menu, 0 for tutorial
     [SerializeField] private float levelDuration;
     [SerializeField] private Level[] levels;
+    [SerializeField] private ConversationLocation[] locations;
     
+    private PersonController personController;
     private float levelTime;
-    
+    private float pointTime;
+    private int delayAmount = 1; //the seconds count
     private bool started = false;
     private bool finished = false;
+    private int playerMultiplier;
+    private float playerPoints;
 
     public int LevelNumber
     {
@@ -36,6 +41,11 @@ public class LevelManager : MonoBehaviour
     {
         get { return levelTime; }
     }
+
+    public ConversationLocation[] ConversationLocations
+    {
+        get { return locations; }
+    }
     
     private void Awake()
     {
@@ -48,6 +58,8 @@ public class LevelManager : MonoBehaviour
         {
             Destroy(this.gameObject);
         } 
+        
+        personController = GetComponent<PersonController>();
     }
 
     private void Update()
@@ -57,11 +69,21 @@ public class LevelManager : MonoBehaviour
             if (levelTime > 0)
             {
                 levelTime -= Time.deltaTime;
+                
+                pointTime += Time.deltaTime;
+                if (playerMultiplier > 1)
+                {
+                    if (pointTime >= delayAmount)
+                    {
+                        playerPoints += 1 * playerMultiplier;
+                    }
+                }
             }
             else
             {
                 if (finished == false)
                 {
+                    //Show the failure menu, and an option to restart
                     //RestartLevel(); //This for real
                     started = false; //temp for debugging
                     return;
@@ -111,5 +133,12 @@ public class LevelManager : MonoBehaviour
         Debug.Log("Resetting Level");
         levelTime = levelDuration;
         started = false;
+    }
+
+    public void SetPlayerMultiplier(int multiplier)
+    {
+        if (multiplier <= 0)
+            playerMultiplier = 1;
+        playerMultiplier = multiplier;
     }
 }

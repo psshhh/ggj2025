@@ -1,11 +1,20 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : MonoBehaviour, IPerson
 {
+    public int CurrentTopic => currentTopic;
 
+    private int currentTopic = 0;
+    private int previousTopic = 0;
     private int points;
+
+    //List of player input topics
+    [SerializeField] private List<Topic> topics;
+    
+    private PersonController personController;
     
     private void Awake()
     {
@@ -16,7 +25,7 @@ public class Player : MonoBehaviour, IPerson
         //Get level duration from GameManager
         // GameManager.instance.
         
-        
+        personController = FindFirstObjectByType<PersonController>();
     }
 
     private void Update()
@@ -35,7 +44,7 @@ public class Player : MonoBehaviour, IPerson
     [ContextMenu("Start Convo")]
     public void StartConvo()
     {
-        StartConversation(3, 10);
+        StartConversation(topics.Count);
     }
 
     //Debug only
@@ -43,29 +52,38 @@ public class Player : MonoBehaviour, IPerson
     {
         StartCoroutine(ConversationTimer(duration, topicCount));
     }
-    
+
     public void StartConversation(int topicCount)
     {
         var duration = LevelManager.instance.LevelDuration;
+        currentTopic = (int)topics[0];
+        previousTopic = currentTopic;
         StartCoroutine(ConversationTimer(duration, topicCount));
     }
     
     IEnumerator ConversationTimer(float duration, int topicCount)
     {
-        Debug.Log("conversation started");
+        Debug.Log("conversation started with " + topicCount + " topics");
         var conversationTime = duration / topicCount;
         
         for (var topicIndex = 0; topicIndex < topicCount; topicIndex++)
         {
-            Debug.Log("started " + topicIndex);
+            currentTopic = (int)topics[topicIndex];
+            
+            var topic = topics[currentTopic];
+            Debug.Log("started talking about " + topic);
+            personController.MovePerson(this, previousTopic, currentTopic);
             yield return new WaitForSeconds(conversationTime);
-            Debug.Log("ended " + topicIndex);
-            //Change the topic here currentTopic = etc 
+            Debug.Log("ended talking about " + topic);
+            previousTopic = currentTopic;
         }
+
+        Debug.Log("finished conversations");
     }
 
-    public void MovePerson()
+    public void MovePerson(Vector3 destination)
     {
-        throw new System.NotImplementedException();
+        transform.position = destination;
+        //Play a cute math animation instead
     }
 }
