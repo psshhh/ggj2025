@@ -12,20 +12,25 @@ public class ConversationLocation : MonoBehaviour
         }
     }
 
-    public void AddCount()
+    public void AddCount(int multiplier)
     {
-        count++;
+        count += multiplier;
     }
 
-    public void RemoveCount()
+    public void RemoveCount(int multiplier)
     {
         if (count == 0)
             return;
-        count--;
+        count -= multiplier;
     }
 
     public int GetCount()
     {
         return count;
+    }
+
+    public void ClearCount()
+    {
+        count = 0;
     }
 }

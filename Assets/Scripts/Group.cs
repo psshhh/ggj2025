@@ -1,17 +1,14 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-// public class Topic
-// {
-//     public string topicName;
-//
-//     public Topic(string topic)
-//     {
-//         topicName = topic;
-//     }
-// }
-
+/// <summary>
+/// Controls the groups of people having conversations.
+///  
+/// Almost a duplicate of Player code but ran out of time to convert IPerson into a
+/// Person Monobehaviour that would have consolidated these scripts
+/// </summary>
 public class Group : MonoBehaviour, IPerson
 {
     public int CurrentTopic => currentTopic;
@@ -19,47 +16,55 @@ public class Group : MonoBehaviour, IPerson
     [SerializeField] private int numberOfPeople;
     [SerializeField] private List<Topic> topics;
     
+    private PersonController personController;
+    private Vector3 originalPosition;
     private int currentTopic = 0;
+    private int previousTopic = 0;
+
+    private Bubble bubble;
+
+    public int NumberOfPeople => numberOfPeople;
     
     private void Awake()
     {
-        numberOfPeople = transform.childCount;
+        numberOfPeople = topics.Count;
+        originalPosition = transform.position;
+        personController = LevelManager.instance.PersonController;
+        bubble = GetComponent<Bubble>();
     }
-    
-    //for a group this is the groupNumber;
+
     public void StartConversation(int topicCount)
     {
-        topicCount = topics.Count;
         var duration = LevelManager.instance.LevelDuration;
-        StartCoroutine(ConversationTimer(duration, topicCount));
+        currentTopic = (int)topics[0];
+        previousTopic = currentTopic;
+        StartCoroutine(ConversationTimer(duration, topics.Count));
     }
     
     IEnumerator ConversationTimer(float duration, int topicCount)
     {
-        Debug.Log("conversation started");
         var conversationTime = duration / topicCount;
         
         for (var topicIndex = 0; topicIndex < topicCount; topicIndex++)
         {
-            Debug.Log("started " + topicIndex);
+            currentTopic = (int)topics[topicIndex];
+            
+            personController.MovePerson(this, previousTopic, currentTopic);
             yield return new WaitForSeconds(conversationTime);
-            Debug.Log("ended " + topicIndex);
-            //Change the topic here currentTopic = etc 
-            if (topicIndex < topicCount - 1)
-            {
-                currentTopic = (int)topics[topicIndex++];
-            }
+            previousTopic = currentTopic;
         }
     }
 
     public void MovePerson(Vector3 destination)
     {
+        bubble.UpdateBubble(destination);
         transform.position = destination;
         //Play a cute math animation instead
     }
-
-    // IEnumerator FloatBubble(Vector3 destination)
-    // {
-    //     
-    // }
+    
+    public void Reset()
+    {
+        transform.position = originalPosition;
+        bubble.ResetBubble();
+    }
 }

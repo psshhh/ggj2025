@@ -5,47 +5,55 @@ using UnityEngine;
 [Serializable]
 public class Level
 {
-    public int number;
+    // public int number;
     public float duration;
+    public float pointTarget;
+    public GameObject levelObjects;
+
+    public List<Group> groups;
 }
 
 public class LevelManager : MonoBehaviour
 {
     public static LevelManager instance;
     
-    [SerializeField] private int levelNumber; //-1 for menu, 0 for tutorial
-    [SerializeField] private float levelDuration;
     [SerializeField] private Level[] levels;
     [SerializeField] private ConversationLocation[] locations;
+    [SerializeField] private Player player;
     
     private PersonController personController;
+    private int currentLevel;
+    private float levelDuration;
     private float levelTime;
+    
     private float pointTime;
     private int delayAmount = 1; //the seconds count
     private bool started = false;
     private bool finished = false;
     private int playerMultiplier;
-    private float playerPoints;
+    private int playerPoints;
 
-    public int LevelNumber
+    public float CurrentLevelTarget
     {
-        get { return levelNumber; }
+        get { return levels[currentLevel].pointTarget; }
     }
 
     public float LevelDuration
     {
-        get { return levelDuration; }
+        get { return levels[currentLevel].duration; }
     }
 
-    public float LevelTime
+    public PersonController PersonController
     {
-        get { return levelTime; }
+        get { return personController; }
     }
 
     public ConversationLocation[] ConversationLocations
     {
         get { return locations; }
     }
+
+    public int PlayerPoints => playerPoints;
     
     private void Awake()
     {
@@ -62,6 +70,17 @@ public class LevelManager : MonoBehaviour
         personController = GetComponent<PersonController>();
     }
 
+    private void Start()
+    {
+        foreach (Level level in levels)
+        {
+            foreach (Group group in level.levelObjects.GetComponentsInChildren<Group>())
+            {
+                level.groups.Add(group);
+            }
+        }
+    }
+
     private void Update()
     {
         if (started)
@@ -73,72 +92,125 @@ public class LevelManager : MonoBehaviour
                 pointTime += Time.deltaTime;
                 if (playerMultiplier > 1)
                 {
-                    if (pointTime >= delayAmount)
+                    if (pointTime > delayAmount)
                     {
+                        pointTime = 0;
                         playerPoints += 1 * playerMultiplier;
                     }
+                }
+                else
+                {
+                    //make the player sad
                 }
             }
             else
             {
-                if (finished == false)
+                if (playerPoints < CurrentLevelTarget)
                 {
                     //Show the failure menu, and an option to restart
-                    //RestartLevel(); //This for real
-                    started = false; //temp for debugging
-                    return;
+                    GameManager.instance.ShowRestartLevel();
+                    //wait... for the player to hit the restart button which just plays StartLevel()
                 }
-                EndLevel();
+                else
+                {
+                    EndLevel();
+                }
+                
             }
         }
+    }
+
+    public void LoadLevel()
+    {
+        //do a blank screen cover
+        
+        levels[currentLevel].levelObjects.SetActive(true);
+        ResetLevel();
+        //The player's input buttons setactive, there's a play button here that starts the level
     }
         
     [ContextMenu("Start Level")]
     public void StartLevel()
     {
         Debug.Log("Starting Level");
-        ResetLevel();
+        levelTime = levels[currentLevel].duration;
         started = true;
+        foreach (Group group in levels[currentLevel].groups)
+        {
+            group.StartConversation(0);
+        }
         Debug.Log("Started Level");
     }
 
     [ContextMenu("Stop Level")]
     public void EndLevel()
     {
-        if (finished)
+        Debug.Log("Finished Level");
+        if (currentLevel < levels.Length - 1)
         {
-            Debug.Log("Finished Level");
-            levelNumber++; //This makes it seem like you need a Level Class so you can
-                           //increment through a level list and not have multiple scenes
-                           //because I hate that anyway
-            ResetLevel();
+            levels[currentLevel].levelObjects.SetActive(false);
+            currentLevel++; //This makes it seem like you need a Level Class so you can
+            //increment through a level list and not have multiple scenes
+            //because I hate that anyway
             //queue up next level
+            LoadLevel();
         }
-        //temporarily stop the level
-        started = false;
-    }
-
-    public void RestartLevel()
-    {
-        Debug.Log("Restarting Level");
-        //queue up restart
-        
-        ResetLevel();
-        //wait... or maybe make this a player input restart
-        StartLevel();
+        else
+        {
+            //display the you win screen!
+            //more levels coming soon!
+            GameManager.instance.ShowWinMenu();
+            currentLevel = 0;
+        }
     }
 
     private void ResetLevel()
     {
         Debug.Log("Resetting Level");
-        levelTime = levelDuration;
+        player.Reset();
+        foreach (Group group in levels[currentLevel].groups)
+        {
+            group.Reset();
+        }
+        ClearConversation();
+        levelTime = levels[currentLevel].duration;
+        pointTime = 0;
+        playerPoints = 0;
         started = false;
     }
-
+    
     public void SetPlayerMultiplier(int multiplier)
     {
         if (multiplier <= 0)
             playerMultiplier = 1;
         playerMultiplier = multiplier;
+    }
+
+    public void RemoveConversation(int topic, int multiplier)
+    {
+        ConversationLocations[topic].RemoveCount(multiplier);
+    }
+    
+    public void AddConversation(int topic, int multiplier)
+    {
+        ConversationLocations[topic].AddCount(multiplier);
+    }
+
+    public Vector3 GetConversationLocation(int topic)
+    {
+        return ConversationLocations[topic].transform.position;
+    }
+
+    public int GetConversationCount(int topic)
+    {
+        return ConversationLocations[topic].GetCount();
+    }
+
+    private void ClearConversation()
+    {
+        foreach (ConversationLocation conversation in ConversationLocations)
+        {
+            conversation.ClearCount();
+        }
     }
 }
