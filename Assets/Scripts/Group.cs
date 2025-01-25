@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -57,8 +56,11 @@ public class Group : MonoBehaviour, IPerson
 
     public void MovePerson(Vector3 destination)
     {
-        bubble.UpdateBubble(destination);
-        transform.position = destination;
+        var randomX = Random.Range(-1f, 1f);
+        var randomY = Random.Range(-1f, 1f);
+        var offset = new Vector3(destination.x + randomX, destination.y + randomY, destination.z);
+        bubble.UpdateBubble(offset);
+        transform.position = offset;
         //Play a cute math animation instead
     }
     

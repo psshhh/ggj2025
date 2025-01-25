@@ -26,7 +26,7 @@ public class PersonController : MonoBehaviour
 
     public void MovePerson(IPerson person, int previousTopic, int newTopic)
     {
-        if (previousTopic >= 0)
+        if (previousTopic != newTopic)
             levelManager.RemoveConversation(previousTopic, person.NumberOfPeople);
         
         levelManager.AddConversation(newTopic,person.NumberOfPeople);

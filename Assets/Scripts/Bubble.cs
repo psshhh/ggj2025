@@ -8,14 +8,23 @@ public class Bubble : MonoBehaviour
 
     [SerializeField] private float height = 5;
     [SerializeField] private float speed = 5;
+    [SerializeField] private AudioClip sound;
 
     private Vector3 startPosition;
     private Vector3 originalPosition;
 
+    private AudioSource audioSource;
+    
     private void Awake()
     {
         startPosition = transform.position;
         originalPosition = transform.position;
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource != null)
+        {
+            audioSource.volume = .5f;
+            audioSource.clip = sound;
+        }
     }
     
     private void Update()
@@ -28,6 +37,7 @@ public class Bubble : MonoBehaviour
     public void UpdateBubble(Vector3 newPosition)
     {
         startPosition = newPosition;
+        audioSource?.Play(); //Don't like the chosen sound so no
     }
 
     public void ResetBubble()

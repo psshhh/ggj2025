@@ -31,6 +31,7 @@ public class Player : MonoBehaviour, IPerson
     [SerializeField] private SpriteRenderer topicIcon;
     [SerializeField] private SpriteRenderer worriedIcon;
     [SerializeField] private TMPro.TMP_Text pointsText;
+    [SerializeField] private TMPro.TMP_Text pointsTextOnMenu;
     
     private PersonController personController;
     private Vector3 originalPosition;
@@ -58,8 +59,11 @@ public class Player : MonoBehaviour, IPerson
 
     private void Update()
     {
+        var points = LevelManager.instance.PlayerPoints + "00";
         if (pointsText != null)
-            pointsText.text = LevelManager.instance.PlayerPoints + "00";
+            pointsText.text = points;
+        if (pointsTextOnMenu != null)
+            pointsTextOnMenu.text = points;
     }
 
     public void StartConversation()

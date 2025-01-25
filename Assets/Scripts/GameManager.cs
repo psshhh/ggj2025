@@ -10,11 +10,14 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject mainMenu;
     [SerializeField] private GameObject instructions;
     [SerializeField] private GameObject restartMenu;
+    [SerializeField] private GameObject nextLevelMenu;
     [SerializeField] private GameObject winMenu;
+    [SerializeField] private GameObject playerInputButtons;
     
     [SerializeField] private Button playButton;
     [SerializeField] private Button goButton;
     [SerializeField] private Button restartButton;
+    [SerializeField] private Button nextLevelButton;
     [SerializeField] private Button homeButton;
     
     private int levelNumber; //-1 for menu, 0 for tutorial
@@ -41,6 +44,7 @@ public class GameManager : MonoBehaviour
         playButton.onClick.AddListener(PlayGame);
         goButton.onClick.AddListener(StartGame);
         restartButton.onClick.AddListener(StartGame);
+        nextLevelButton.onClick.AddListener(StartGame);
         homeButton.onClick.AddListener(FullReset);
 
         //Just to speed things up
@@ -54,6 +58,7 @@ public class GameManager : MonoBehaviour
     private void PlayGame()
     {
         instructions.SetActive(true);
+        winMenu.SetActive(false);
     }
 
     private void StartGame()
@@ -64,6 +69,10 @@ public class GameManager : MonoBehaviour
         if (restartMenu.activeSelf)
             restartMenu.SetActive(false);
         
+        if (nextLevelMenu.activeSelf)
+            nextLevelMenu.SetActive(false);
+        
+        playerInputButtons.SetActive(true);
         LevelManager.instance.LoadLevel();
     }
 
@@ -71,6 +80,7 @@ public class GameManager : MonoBehaviour
     public void PlayArcade()
     {
         mainMenu.SetActive(false);
+        throw new NotImplementedException();
     }
 
     public void ShowRestartLevel()
@@ -80,12 +90,21 @@ public class GameManager : MonoBehaviour
 
     public void FullReset()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        // SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        LevelManager.instance.FullReset();
+        mainMenu.SetActive(true);
     }
 
     public void ShowWinMenu()
     {
         winMenu.SetActive(true);
+        playerInputButtons.SetActive(false);
+        instructions.SetActive(false);
+    }
+    
+    public void ShowNextLevelMenu()
+    {
+        nextLevelMenu.SetActive(true);
     }
 
     public void FadeInAndOut()

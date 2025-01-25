@@ -116,7 +116,6 @@ public class LevelManager : MonoBehaviour
                 {
                     EndLevel();
                 }
-                
             }
         }
     }
@@ -150,18 +149,19 @@ public class LevelManager : MonoBehaviour
         if (currentLevel < levels.Length - 1)
         {
             levels[currentLevel].levelObjects.SetActive(false);
-            currentLevel++; //This makes it seem like you need a Level Class so you can
-            //increment through a level list and not have multiple scenes
-            //because I hate that anyway
+            started = false;
+            currentLevel++; 
             //queue up next level
-            LoadLevel();
+            // LoadLevel(); //Opted to do player input to take a break
+            GameManager.instance.ShowNextLevelMenu();
         }
         else
         {
+            Debug.Log("Finished GAME");
             //display the you win screen!
             //more levels coming soon!
             GameManager.instance.ShowWinMenu();
-            currentLevel = 0;
+            started = false;
         }
     }
 
@@ -178,6 +178,12 @@ public class LevelManager : MonoBehaviour
         pointTime = 0;
         playerPoints = 0;
         started = false;
+    }
+
+    public void FullReset()
+    {
+        levels[currentLevel].levelObjects.SetActive(false);
+        currentLevel = 0;
     }
     
     public void SetPlayerMultiplier(int multiplier)
