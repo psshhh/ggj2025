@@ -96,11 +96,12 @@ public class LevelManager : MonoBehaviour
                     {
                         pointTime = 0;
                         playerPoints += 1 * playerMultiplier;
+                        player.MakeSad(false);
                     }
                 }
                 else
                 {
-                    //make the player sad
+                    player.MakeSad(true);
                 }
             }
             else
@@ -137,7 +138,7 @@ public class LevelManager : MonoBehaviour
         started = true;
         foreach (Group group in levels[currentLevel].groups)
         {
-            group.StartConversation(0);
+            group.StartConversation();
         }
         Debug.Log("Started Level");
     }

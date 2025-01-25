@@ -33,7 +33,7 @@ public class Group : MonoBehaviour, IPerson
         bubble = GetComponent<Bubble>();
     }
 
-    public void StartConversation(int topicCount)
+    public void StartConversation()
     {
         var duration = LevelManager.instance.LevelDuration;
         currentTopic = (int)topics[0];

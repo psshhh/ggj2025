@@ -29,12 +29,20 @@ public class Player : MonoBehaviour, IPerson
     [SerializeField] private Button startLevelBtn;
     
     [SerializeField] private SpriteRenderer topicIcon;
+    [SerializeField] private SpriteRenderer worriedIcon;
     [SerializeField] private TMPro.TMP_Text pointsText;
     
     private PersonController personController;
     private Vector3 originalPosition;
     private bool singleTopic = true;
+    private Bubble bubble;
 
+    private void Awake()
+    {
+        bubble = GetComponent<Bubble>();
+        originalPosition = transform.position;
+    }
+    
     private void Start()
     {
         personController = LevelManager.instance.PersonController;
@@ -45,8 +53,7 @@ public class Player : MonoBehaviour, IPerson
         gameBtn.onClick.AddListener(()=> AddRemoveTopic(3));
         foodBtn.onClick.AddListener(()=> AddRemoveTopic(4));
         
-        startLevelBtn.onClick.AddListener(()=> StartConversation(0));
-        originalPosition = transform.position;
+        startLevelBtn.onClick.AddListener(StartConversation);
     }
 
     private void Update()
@@ -55,7 +62,7 @@ public class Player : MonoBehaviour, IPerson
             pointsText.text = LevelManager.instance.PlayerPoints + "00";
     }
 
-    public void StartConversation(int topicCount)
+    public void StartConversation()
     {
         ToggleInputButtons(false);
         LevelManager.instance.StartLevel();
@@ -87,10 +94,15 @@ public class Player : MonoBehaviour, IPerson
 
     public void MovePerson(Vector3 destination)
     {
+        bubble.UpdateBubble(destination);
         transform.position = destination;
         //Play a cute math animation instead
     }
 
+    public void MakeSad(bool active)
+    {
+        worriedIcon.enabled = active;
+    }
     private void AddRemoveTopic(int topic)
     {
         var topicToChange = (Topic)topic;
@@ -104,13 +116,14 @@ public class Player : MonoBehaviour, IPerson
 
             topics.Add(topicToChange);
             topicIcon.sprite = topicSprites[topic];
+            startLevelBtn.enabled = true;
         }
         else
         {
             topics.Remove(topicToChange);
             topicIcon.sprite = topicSprites[5];
+            startLevelBtn.enabled = false;
         }
-            
     }
 
     public void Reset()
@@ -119,6 +132,9 @@ public class Player : MonoBehaviour, IPerson
         topics.Clear();
         topicIcon.sprite = null;
         ToggleInputButtons(true);
+        startLevelBtn.enabled = false;
+        MakeSad(false);
+        bubble.ResetBubble();
     }
 
     private void ToggleInputButtons(bool active)
