@@ -27,9 +27,9 @@ public class PersonController : MonoBehaviour
     public void MovePerson(IPerson person, int previousTopic, int newTopic)
     {
         if (previousTopic != newTopic)
-            levelManager.RemoveConversation(previousTopic, person.NumberOfPeople);
+            levelManager.RemoveConversation(previousTopic, person);
         
-        levelManager.AddConversation(newTopic,person.NumberOfPeople);
+        levelManager.AddConversation(newTopic, person);
         person.MovePerson(levelManager.GetConversationLocation(newTopic));
 
         //update the multiplier every time any person moves

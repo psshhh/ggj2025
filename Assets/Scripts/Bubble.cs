@@ -14,6 +14,8 @@ public class Bubble : MonoBehaviour
     private Vector3 originalPosition;
 
     private AudioSource audioSource;
+
+    private bool isPaused = false;
     
     private void Awake()
     {
@@ -29,6 +31,9 @@ public class Bubble : MonoBehaviour
     
     private void Update()
     {
+        if (isPaused)
+            return;
+        
         var moveBy = Mathf.PingPong(speed * Time.time, height);
         var moveByX = Mathf.PingPong((speed / 2) * Time.time, height);
         transform.position = new Vector3(startPosition.x + moveByX, startPosition.y + moveBy, transform.position.z);
@@ -36,8 +41,20 @@ public class Bubble : MonoBehaviour
 
     public void UpdateBubble(Vector3 newPosition)
     {
+        isPaused = false;
         startPosition = newPosition;
-        audioSource?.Play(); //Don't like the chosen sound so no
+    }
+
+    public void MovePausedBubble()
+    {
+        isPaused = true;
+        audioSource?.Play(); 
+    }
+
+    public void IncreaseSpeed(int multiplier)
+    {
+        if (multiplier > 1)
+            speed *= multiplier;
     }
 
     public void ResetBubble()

@@ -11,6 +11,7 @@ using UnityEngine;
 public class Group : MonoBehaviour, IPerson
 {
     public int CurrentTopic => currentTopic;
+    public Bubble Bubble => bubble;
 
     [SerializeField] private int numberOfPeople;
     [SerializeField] private List<Topic> topics;
@@ -21,6 +22,7 @@ public class Group : MonoBehaviour, IPerson
     private int previousTopic = 0;
 
     private Bubble bubble;
+    private Vector3 currentPosition;
 
     public int NumberOfPeople => numberOfPeople;
     
@@ -59,9 +61,28 @@ public class Group : MonoBehaviour, IPerson
         var randomX = Random.Range(-1f, 1f);
         var randomY = Random.Range(-1f, 1f);
         var offset = new Vector3(destination.x + randomX, destination.y + randomY, destination.z);
-        bubble.UpdateBubble(offset);
-        transform.position = offset;
-        //Play a cute math animation instead
+        bubble.MovePausedBubble();
+        
+        StartCoroutine(LerpTo(offset));
+    }
+    
+    IEnumerator LerpTo(Vector3 destination)
+    {
+        var elapsedTime = 0f;
+        var waitTime = 1;
+        currentPosition = transform.position;
+        
+        while (elapsedTime < waitTime)
+        {
+            transform.position = Vector3.Lerp(currentPosition, destination, (elapsedTime / waitTime));
+            elapsedTime += Time.deltaTime;
+            
+            yield return null;
+        }  
+        
+        transform.position = destination;
+        bubble.UpdateBubble(destination);
+        yield return null;
     }
     
     public void Reset()

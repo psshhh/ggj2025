@@ -193,14 +193,14 @@ public class LevelManager : MonoBehaviour
         playerMultiplier = multiplier;
     }
 
-    public void RemoveConversation(int topic, int multiplier)
+    public void RemoveConversation(int topic, IPerson person)
     {
-        ConversationLocations[topic].RemoveCount(multiplier);
+        ConversationLocations[topic].RemoveCount(person);
     }
     
-    public void AddConversation(int topic, int multiplier)
+    public void AddConversation(int topic, IPerson person)
     {
-        ConversationLocations[topic].AddCount(multiplier);
+        ConversationLocations[topic].AddCount(person);
     }
 
     public Vector3 GetConversationLocation(int topic)

@@ -1,27 +1,24 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class ConversationLocation : MonoBehaviour
 {
     private int count;
-    
-    private void Update()
+
+    private List<IPerson> people = new List<IPerson>();
+
+    public void AddCount(IPerson person)
     {
-        if (transform.childCount != 0)
-        {
-            //float the people in a random circular fashion
-        }
+        count += person.NumberOfPeople;
+        people.Add(person);
     }
 
-    public void AddCount(int multiplier)
-    {
-        count += multiplier;
-    }
-
-    public void RemoveCount(int multiplier)
+    public void RemoveCount( IPerson person)
     {
         if (count == 0)
             return;
-        count -= multiplier;
+        count -= person.NumberOfPeople;
+        people.Remove(person);
     }
 
     public int GetCount()
@@ -32,5 +29,6 @@ public class ConversationLocation : MonoBehaviour
     public void ClearCount()
     {
         count = 0;
+        people.Clear();
     }
 }

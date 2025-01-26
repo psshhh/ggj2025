@@ -11,6 +11,7 @@ using UnityEngine.UI;
 public class Player : MonoBehaviour, IPerson
 {
     public int CurrentTopic => currentTopic;
+    public Bubble Bubble => bubble;
     public int NumberOfPeople => 1;
 
     private int currentTopic = 0;
@@ -35,6 +36,7 @@ public class Player : MonoBehaviour, IPerson
     
     private PersonController personController;
     private Vector3 originalPosition;
+    private Vector3 currentPosition;
     private bool singleTopic = true;
     private Bubble bubble;
 
@@ -98,11 +100,30 @@ public class Player : MonoBehaviour, IPerson
 
     public void MovePerson(Vector3 destination)
     {
-        bubble.UpdateBubble(destination);
-        transform.position = destination;
-        //Play a cute math animation instead
+        bubble.MovePausedBubble();
+        
+        StartCoroutine(LerpTo(destination));
     }
 
+    IEnumerator LerpTo(Vector3 destination)
+    {
+        var elapsedTime = 0f;
+        var waitTime = 1;
+        currentPosition = transform.position;
+        
+        while (elapsedTime < waitTime)
+        {
+            transform.position = Vector3.Lerp(currentPosition, destination, (elapsedTime / waitTime));
+            elapsedTime += Time.deltaTime;
+            
+            yield return null;
+        }  
+        
+        transform.position = destination;
+        bubble.UpdateBubble(destination);
+        yield return null;
+    }
+        
     public void MakeSad(bool active)
     {
         worriedIcon.enabled = active;
