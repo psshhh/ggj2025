@@ -97,11 +97,16 @@ public class LevelManager : MonoBehaviour
                         pointTime = 0;
                         playerPoints += 1 * playerMultiplier;
                         player.MakeSad(false);
+                        player.MakeHappy(true);
+                        player.Pulse(true);
+                        player.Bubble.Talk();
                     }
                 }
                 else
                 {
                     player.MakeSad(true);
+                    player.MakeHappy(false);
+                    player.Pulse(false);
                 }
             }
             else
@@ -174,6 +179,7 @@ public class LevelManager : MonoBehaviour
             group.Reset();
         }
         ClearConversation();
+        player.MakeHappy(false);
         levelTime = levels[currentLevel].duration;
         pointTime = 0;
         playerPoints = 0;

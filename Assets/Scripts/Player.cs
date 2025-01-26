@@ -31,6 +31,7 @@ public class Player : MonoBehaviour, IPerson
     
     [SerializeField] private SpriteRenderer topicIcon;
     [SerializeField] private SpriteRenderer worriedIcon;
+    [SerializeField] private GameObject happyIcon;
     [SerializeField] private TMPro.TMP_Text pointsText;
     [SerializeField] private TMPro.TMP_Text pointsTextOnMenu;
     
@@ -39,6 +40,7 @@ public class Player : MonoBehaviour, IPerson
     private Vector3 currentPosition;
     private bool singleTopic = true;
     private Bubble bubble;
+    
 
     private void Awake()
     {
@@ -128,6 +130,12 @@ public class Player : MonoBehaviour, IPerson
     {
         worriedIcon.enabled = active;
     }
+    
+    public void MakeHappy(bool active)
+    {
+        happyIcon.SetActive(active);
+    }
+    
     private void AddRemoveTopic(int topic)
     {
         var topicToChange = (Topic)topic;
@@ -170,5 +178,34 @@ public class Player : MonoBehaviour, IPerson
         gameBtn.enabled = active;
         foodBtn.enabled = active;
         startLevelBtn.enabled = active;
+    }
+
+    public void Pulse(bool active)
+    {
+        if (active)
+        {
+            StartCoroutine(LerpPulse());
+        }
+        else
+        {
+            pointsText.transform.localScale = Vector3.one;
+            happyIcon.transform.localScale = Vector3.one;
+        }
+    }
+    
+    IEnumerator LerpPulse()
+    {
+        var elapsedTime = 0f;
+        var waitTime = .5f;
+        
+        while (elapsedTime < waitTime)
+        {
+            var newScale = Mathf.PingPong(1 + (elapsedTime / waitTime), 1.5f);
+            pointsText.transform.localScale = new Vector3(newScale, newScale, newScale);
+            happyIcon.transform.localScale = new Vector3(newScale, newScale, newScale);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        yield return null;
     }
 }

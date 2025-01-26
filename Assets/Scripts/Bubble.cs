@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
-public class Bubble : MonoBehaviour
+public class Bubble : MonoBehaviour, IPointerClickHandler
 {
     [SerializeField] private bool canPop = false;
 
@@ -60,5 +62,19 @@ public class Bubble : MonoBehaviour
     public void ResetBubble()
     {
         startPosition = originalPosition;
+    }
+
+    public void Talk()
+    {
+        audioSource.Play();
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (canPop == false)
+            return;
+        
+        audioSource?.Play();
+        GetComponent<Image>().enabled = false;
     }
 }
