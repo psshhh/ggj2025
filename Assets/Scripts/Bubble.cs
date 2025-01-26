@@ -50,6 +50,7 @@ public class Bubble : MonoBehaviour, IPointerClickHandler
     public void MovePausedBubble()
     {
         isPaused = true;
+        audioSource.volume = .5f;
         audioSource?.Play(); 
     }
 
@@ -66,7 +67,8 @@ public class Bubble : MonoBehaviour, IPointerClickHandler
 
     public void Talk()
     {
-        audioSource.Play();
+        audioSource.volume = .75f;
+        audioSource?.Play();
     }
 
     public void OnPointerClick(PointerEventData eventData)
