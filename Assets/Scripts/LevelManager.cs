@@ -20,6 +20,7 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private Level[] levels;
     [SerializeField] private ConversationLocation[] locations;
     [SerializeField] private Player player;
+    [SerializeField] private TMPro.TMP_Text goalText;
     
     private PersonController personController;
     private int currentLevel;
@@ -181,6 +182,7 @@ public class LevelManager : MonoBehaviour
         ClearConversation();
         player.MakeHappy(false);
         levelTime = levels[currentLevel].duration;
+        goalText.text = "Goal: " + levels[currentLevel].pointTarget + "00";
         pointTime = 0;
         playerPoints = 0;
         started = false;
